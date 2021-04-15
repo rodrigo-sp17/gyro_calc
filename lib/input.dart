@@ -12,6 +12,10 @@ import 'package:intl/intl.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:latlong/latlong.dart';
 
+import 'data/input_data.dart';
+import 'data/lat_sign.dart';
+import 'data/long_sign.dart';
+
 class InputPage extends StatefulWidget {
   InputPage({Key key, this.title}) : super(key: key);
   final String title;
@@ -40,14 +44,6 @@ class InputForm extends StatefulWidget {
   InputFormState createState() => InputFormState();
 }
 
-
-
-class OutputData {
-
-}
-
-
-
 class InputFormState extends State<InputForm> {
   InputData inputData = new InputData();
 
@@ -69,6 +65,8 @@ class InputFormState extends State<InputForm> {
 
   FocusNode _date, _time, _latDeg, _latMin, _longDeg, _longMin, _az;
 
+  final _timeController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +77,7 @@ class InputFormState extends State<InputForm> {
     _longDeg = FocusNode();
     _longMin = FocusNode();
     _az = FocusNode();
+    _timeController.text = timeTemplate.format(inputData.time);
   }
 
   @override
@@ -90,6 +89,7 @@ class InputFormState extends State<InputForm> {
     _longDeg.dispose();
     _longMin.dispose();
     _az.dispose();
+    _timeController.dispose();
     super.dispose();
   }
 
@@ -104,7 +104,8 @@ class InputFormState extends State<InputForm> {
       log(inputData.toString());
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => OutputPage(inputData))
+          MaterialPageRoute(
+              builder: (context) => OutputPage(inputData: inputData))
       );
     }
   }
@@ -206,7 +207,6 @@ class InputFormState extends State<InputForm> {
     } else {
       result = LongSign.W;
     }
-
     setState(() {
       inputData.longSign = result;
     });
@@ -214,13 +214,22 @@ class InputFormState extends State<InputForm> {
 
   @override
   Widget build(BuildContext context) {
+    const sizedBox = SizedBox(height: 15);
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Scrollbar(
         child: ListView(
+          padding: EdgeInsets.only(left: 8, right: 8),
           children: [
-            InputDatePickerFormField(
+            InputDecorator(
+              decoration: InputDecoration(
+                filled: true,
+                icon: Icon(Icons.calendar_today),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 2)
+              ),
+              child: InputDatePickerFormField(
                 initialDate: inputData.date,
                 firstDate: DateTime(2012, 1),
                 lastDate: DateTime(2100),
@@ -233,52 +242,73 @@ class InputFormState extends State<InputForm> {
                     inputData.date = date;
                   });
                 },
-            ),
-            TextFormField(
-              initialValue: timeTemplate.format(inputData.time),
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                filled: true,
-                icon: const Icon(Icons.access_time),
-                hintText: 'Current time',
-                suffixText: 'UTC'
               ),
-              keyboardType: TextInputType.number,
-              maxLength: 8,
-              maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              validator: _validateTime,
-              inputFormatters: [timeFormatter],
-              onSaved: (value) {
-                DateTime newTime = timeTemplate.parse(value);
-                setState(() {
-                  inputData.time = newTime;
-                });
-              },
+            ),
+            sizedBox,
+            Row(
+              children: [
+                Flexible(
+                  child: TextFormField(
+                    controller: _timeController,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      filled: true,
+                      icon: const Icon(Icons.access_time),
+                      labelText: 'Time',
+                      hintText: 'Current time',
+                      suffixText: 'UTC',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: _validateTime,
+                    inputFormatters: [timeFormatter],
+                    onSaved: (value) {
+                      DateTime newTime = timeTemplate.parse(value);
+                      setState(() {
+                        inputData.time = newTime;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _timeController.text = timeTemplate.format(DateTime.now()
+                        .toUtc());
+                  },
+                  child: Text('UPDATE'),
+                )
+              ],
             ),
             Divider(
-              height: 20,
+              height: 40,
               thickness: 5,
               indent: 20,
               endIndent: 20,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                    width: 55,
+                    child: Text('LAT')
+                ),
                 Flexible(
                   child: TextFormField(
+                    textAlign: TextAlign.end,
                     focusNode: _latDeg,
                     initialValue: inputData.latDeg.toString(),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                        filled: true,
-                        labelText: 'LAT',
-                        suffixText: '°'
+                      filled: true,
+                      suffixText: '°',
                     ),
-                    maxLength: 3,
-                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     keyboardType: TextInputType.number,
                     validator: _validateLatDeg,
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
+                      new MaskTextInputFormatter(
+                        mask: "##",
+                        filter: { "#": RegExp(r'[0-9]')}
+                      )
                     ],
                     onSaved: (value) {
                       setState(() {
@@ -287,8 +317,10 @@ class InputFormState extends State<InputForm> {
                     },
                   ),
                 ),
+                SizedBox(width: 20),
                 Flexible(
                     child: TextFormField(
+                      textAlign: TextAlign.end,
                       focusNode: _latMin,
                       initialValue: inputData.latMin.toString(),
                       textInputAction: TextInputAction.next,
@@ -296,8 +328,6 @@ class InputFormState extends State<InputForm> {
                           filled: true,
                           suffixText: '\''
                       ),
-                      maxLength: 5,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       keyboardType: TextInputType.number,
                       validator: _validateLatMin,
                       inputFormatters: [minFormatter],
@@ -308,30 +338,37 @@ class InputFormState extends State<InputForm> {
                       },
                     ),
                 ),
+                SizedBox(width: 20),
                 ElevatedButton(
                     onPressed: _handleLatSign,
                     child: Text(inputData.latSign.toString().split('.').last)
                 )
               ],
             ),
+            sizedBox,
             Row(
               children: [
+                SizedBox(
+                  width: 55,
+                  child: Text('LONG')
+                ),
                 Flexible(
                   child: TextFormField(
+                    textAlign: TextAlign.end,
                     focusNode: _longDeg,
                     initialValue: inputData.longDeg.toString(),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
-                        labelText: 'LONG',
                         suffixText: '°'
                     ),
-                    maxLength: 3,
-                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     keyboardType: TextInputType.number,
                     validator: _validateLongDeg,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
+                    inputFormatters: [
+                      new MaskTextInputFormatter(
+                          mask: "###",
+                          filter: { "#": RegExp(r'[0-9]')}
+                      )
                     ],
                     onSaved: (value) {
                       setState(() {
@@ -340,8 +377,10 @@ class InputFormState extends State<InputForm> {
                     },
                   ),
                 ),
+                SizedBox(width: 20),
                 Flexible(
                   child: TextFormField(
+                    textAlign: TextAlign.end,
                     focusNode: _longMin,
                     initialValue: inputData.longMin.toString(),
                     textInputAction: TextInputAction.next,
@@ -349,8 +388,6 @@ class InputFormState extends State<InputForm> {
                         filled: true,
                         suffixText: '\''
                     ),
-                    maxLength: 5,
-                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     keyboardType: TextInputType.number,
                     validator: _validateLongMin,
                     inputFormatters: [minFormatter],
@@ -361,12 +398,14 @@ class InputFormState extends State<InputForm> {
                     },
                   ),
                 ),
+                SizedBox(width: 20),
                 ElevatedButton(
                     onPressed: _handleLongSign,
                     child: Text(inputData.longSign.toString().split('.').last)
                 )
               ],
             ),
+            sizedBox,
             TextFormField(
               focusNode: _az,
               initialValue: '000.0',
@@ -377,9 +416,6 @@ class InputFormState extends State<InputForm> {
                 suffixText: '°'
               ),
               keyboardType: TextInputType.number,
-              maxLength: 5,
-              maxLengthEnforcement: MaxLengthEnforcement
-                  .truncateAfterCompositionEnds,
               validator: _validateAz,
               inputFormatters: [azFormatter],
               onSaved: (value) {
@@ -389,6 +425,7 @@ class InputFormState extends State<InputForm> {
                 });
               },
             ),
+            sizedBox,
             ElevatedButton(
                 onPressed: _handleSubmitted,
                 child: Text('CALCULATE'))
