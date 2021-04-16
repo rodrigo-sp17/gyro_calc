@@ -9,7 +9,7 @@ class InputData {
   double azimuth = 0.0;
 
   DateTime getDateTime() {
-    return DateTime(
+    return DateTime.utc(
         date.year,
         date.month,
         date.day,

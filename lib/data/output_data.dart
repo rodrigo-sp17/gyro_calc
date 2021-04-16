@@ -31,11 +31,11 @@ class OutputData {
     _dateTime = inputData.getDateTime();
     _gyroAzimuth = inputData.azimuth;
     _position = inputData.position;
-    this.sunDeclination = _getSunDeclination();
 
     var inter = new SPAIntermediate();
     var output = _getOutputData(inputData, inter);
 
+    this.sunDeclination = inter.delta;
     this.trueAzimuth = output.azimuth;
     this.lha = decimal2sexagesimal(inter.h);
     this.gha = _getGHA(inter.h, inputData.position.getLongDecimal());
@@ -99,18 +99,8 @@ class OutputData {
 
   String _getGHA(double lha, double longitude) {
     double gha;
-    if (longitude < 0) {
-      gha = lha + longitude;
-    } else {
-      gha = lha - longitude;
-    }
+    gha = lha - longitude;
     return decimal2sexagesimal(gha);
-  }
-
-  double _getSunDeclination() {
-    var diff = _dateTime.difference(DateTime(_dateTime.year, 1, 1));
-    var dayOfYear = diff.inDays - 1;
-    return -23.44 * cos(degToRadian(360.0/365 * (dayOfYear + 10)));
   }
 
   double _calculateGyroError(

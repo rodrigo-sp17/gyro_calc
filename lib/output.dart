@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gyro_error/data/output_data.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:spa/spa.dart';
 
 import 'data/input_data.dart';
 
@@ -84,6 +83,14 @@ class _OutputPageState extends State<OutputPage> {
     var hdg = double.tryParse(value);
     if (hdg == null || hdg < 0 || hdg >= 360) {
       return 'Invalid heading';
+    }
+    return null;
+  }
+
+  String _validateMagDecl(String value) {
+    var decl = double.tryParse(value);
+    if (decl == null || decl < -360 || decl > 360) {
+      return 'Invalid declination';
     }
     return null;
   }
@@ -230,9 +237,9 @@ class _OutputPageState extends State<OutputPage> {
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
-                        validator: _validateHdg,
+                        validator: _validateMagDecl,
                         onFieldSubmitted: (value) {
-                          if (_validateHdg(value) == null) {
+                          if (_validateMagDecl(value) == null) {
                             var dec = double.parse(value);
                             setState(() {
                               _magDecController.text = dec.toStringAsFixed(1)
