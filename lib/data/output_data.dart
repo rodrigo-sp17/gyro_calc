@@ -90,7 +90,7 @@ class OutputData {
     if (response.statusCode == 200) {
        Map<String, dynamic> json = jsonDecode(response.body);
        double declination = (json['result'].first)['declination'];
-       _magDeclination = declination;
+       magDeclination = declination;
        return declination;
     } else {
       return _magDeclination;

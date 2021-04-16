@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gyro_error/data/lat_long.dart';
 import 'package:gyro_error/data/output_data.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -30,6 +31,7 @@ class _OutputPageState extends State<OutputPage> {
   final _magHdgController = TextEditingController();
   final _magDecController = TextEditingController();
   bool _isFetchingMagDec = false;
+  LongSign _magDecSign;
   final _gyroErrorController = TextEditingController();
   final _magErrorController = TextEditingController();
 
@@ -45,7 +47,8 @@ class _OutputPageState extends State<OutputPage> {
     _gyroAzController.text = outputData.gyroAzimuth.toStringAsFixed(1);
     _gyroHdgController.text = outputData.gyroHdg.toStringAsFixed(1);
     _magHdgController.text = outputData.magHdg.toStringAsFixed(1);
-    _magDecController.text = outputData.magDeclination.toStringAsFixed(1);
+    _magDecController.text = outputData.magDeclination.abs().toStringAsFixed(1);
+    _magDecSign = outputData.magDeclination.isNegative ? LongSign.W : LongSign.E;
     _fetchMagDeclination();
     _gyroErrorController.text = outputData.getGyroErrorAsString();
     _magErrorController.text = outputData.getMagErrorAsString();
@@ -72,7 +75,9 @@ class _OutputPageState extends State<OutputPage> {
     });
     var magDeclination = outputData.fetchMagDeclination();
     magDeclination.then((value) => {
-      _magDecController.text = value.toStringAsFixed(1)
+      _magDecController.text = value.abs().toStringAsFixed(1),
+      _magDecSign = value.isNegative ? LongSign.W : LongSign.E,
+      this._handleDataChanges()
     });
     magDeclination.whenComplete(() => this.setState(() {
       _isFetchingMagDec = false;
@@ -89,16 +94,42 @@ class _OutputPageState extends State<OutputPage> {
 
   String _validateMagDecl(String value) {
     var decl = double.tryParse(value);
-    if (decl == null || decl < -360 || decl > 360) {
+    if (decl == null || decl < 0 || decl > 360) {
       return 'Invalid declination';
     }
     return null;
   }
 
-  void _handleHeadingChanges() {
+  void _handleDataChanges() {
     setState(() {
       _magErrorController.text = outputData.getMagErrorAsString();
     });
+  }
+
+  void _handleMagDecChanges(String value) {
+    if (_validateMagDecl(value) == null) {
+      var dec = double.parse(value);
+      setState(() {
+        _magDecController.text = dec.toStringAsFixed(1)
+            .padLeft(5, '0');
+        outputData.magDeclination =
+        _magDecSign == LongSign.E ? dec.abs() : dec.abs() * -1;
+      });
+      _handleDataChanges();
+    }
+  }
+
+  void _handleMagDecSign() {
+    var sign;
+    if (_magDecSign == LongSign.E) {
+      sign = LongSign.W;
+    } else {
+      sign = LongSign.E;
+    }
+    setState(() {
+      _magDecSign = sign;
+    });
+    _handleMagDecChanges(_magDecController.text);
   }
 
   @override
@@ -189,7 +220,7 @@ class _OutputPageState extends State<OutputPage> {
                                   .padLeft(5, '0');
                               outputData.gyroHdg = hdg;
                             });
-                            _handleHeadingChanges();
+                            _handleDataChanges();
                           }
                         },
 
@@ -216,7 +247,7 @@ class _OutputPageState extends State<OutputPage> {
                                   .padLeft(5, '0');
                               outputData.magHdg = hdg;
                             });
-                            _handleHeadingChanges();
+                            _handleDataChanges();
                           }
                         },
                       ),
@@ -239,18 +270,13 @@ class _OutputPageState extends State<OutputPage> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
                         validator: _validateMagDecl,
-                        onFieldSubmitted: (value) {
-                          if (_validateMagDecl(value) == null) {
-                            var dec = double.parse(value);
-                            setState(() {
-                              _magDecController.text = dec.toStringAsFixed(1)
-                                  .padLeft(5, '0');
-                              outputData.magDeclination = dec;
-                            });
-                            _handleHeadingChanges();
-                          }
-                        },
+                        onFieldSubmitted: _handleMagDecChanges,
                       )
+                    ),
+                    SizedBox(width: 20,),
+                    ElevatedButton(
+                        onPressed: _handleMagDecSign,
+                        child: Text(_magDecSign.value)
                     ),
                     Visibility(
                       visible: _isFetchingMagDec,
