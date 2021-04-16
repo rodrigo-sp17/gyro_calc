@@ -1,6 +1,3 @@
-import 'dart:developer';
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gyro_error/output.dart';
@@ -63,6 +60,10 @@ class InputFormState extends State<InputForm> {
   FocusNode _date, _time, _latDeg, _latMin, _longDeg, _longMin, _az;
 
   final _timeController = TextEditingController();
+  final _latDegController = TextEditingController();
+  final _latMinController = TextEditingController();
+  final _longDegController = TextEditingController();
+  final _longMinController = TextEditingController();
 
   @override
   void initState() {
@@ -74,7 +75,13 @@ class InputFormState extends State<InputForm> {
     _longDeg = FocusNode();
     _longMin = FocusNode();
     _az = FocusNode();
+
+    _fetchPosition();
     _timeController.text = timeTemplate.format(inputData.time);
+    _latDegController.text = inputData.position.latDeg.toString();
+    _latMinController.text = inputData.position.latMin.toString();
+    _longDegController.text = inputData.position.longDeg.toString();
+    _longMinController.text = inputData.position.longMin.toString();
   }
 
   @override
@@ -87,10 +94,42 @@ class InputFormState extends State<InputForm> {
     _longMin.dispose();
     _az.dispose();
     _timeController.dispose();
+    _latDegController.dispose();
+    _latMinController.dispose();
+    _longDegController.dispose();
+    _longMinController.dispose();
     super.dispose();
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _fetchPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied
+          || permission == LocationPermission.deniedForever) {
+        return;
+      }
+    }
+
+    Position pos = await Geolocator.getCurrentPosition();
+    setState(() {
+      inputData.position = LatLong.fromDoubles(pos.latitude, pos.longitude);
+      _latDegController.text = inputData.position.latDeg.abs().toString();
+      _latMinController.text = inputData.position.latMin.toStringAsFixed(2);
+      _longDegController.text = inputData.position.longDeg.abs().toString();
+      _longMinController.text = inputData.position.longMin.toStringAsFixed(2);
+    });
+  }
 
   void _handleSubmitted() {
     final form = _formKey.currentState;
@@ -290,7 +329,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _latDeg,
-                    initialValue: inputData.position.latDeg.toString(),
+                    controller: _latDegController,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       filled: true,
@@ -320,7 +359,7 @@ class InputFormState extends State<InputForm> {
                     child: TextFormField(
                       textAlign: TextAlign.end,
                       focusNode: _latMin,
-                      initialValue: inputData.position.latMin.toString(),
+                      controller: _latMinController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           filled: true,
@@ -354,7 +393,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _longDeg,
-                    initialValue: inputData.position.longDeg.toString(),
+                    controller: _longDegController,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
@@ -384,7 +423,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _longMin,
-                    initialValue: inputData.position.longMin.toString(),
+                    controller: _longMinController,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
