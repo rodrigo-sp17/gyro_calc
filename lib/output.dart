@@ -40,15 +40,15 @@ class _OutputPageState extends State<OutputPage> {
     outputData = OutputData(widget.inputData);
     _lhaController.text = outputData.lha;
     _ghaController.text = outputData.gha;
-    _sunDecController.text = outputData.sunDeclination.toStringAsFixed(2);
+    _sunDecController.text = outputData.getSunDeclAsString();
     _trueAzController.text = outputData.trueAzimuth.toStringAsFixed(1);
     _gyroAzController.text = outputData.gyroAzimuth.toStringAsFixed(1);
     _gyroHdgController.text = outputData.gyroHdg.toStringAsFixed(1);
     _magHdgController.text = outputData.magHdg.toStringAsFixed(1);
     _magDecController.text = outputData.magDeclination.toStringAsFixed(1);
     _fetchMagDeclination();
-    _gyroErrorController.text = outputData.gyroError.toStringAsFixed(1);
-    _magErrorController.text = outputData.magError.toStringAsFixed(1);
+    _gyroErrorController.text = outputData.getGyroErrorAsString();
+    _magErrorController.text = outputData.getMagErrorAsString();
   }
 
   @override
@@ -97,7 +97,7 @@ class _OutputPageState extends State<OutputPage> {
 
   void _handleHeadingChanges() {
     setState(() {
-      _magErrorController.text = outputData.magError.toStringAsFixed(1);
+      _magErrorController.text = outputData.getMagErrorAsString();
     });
   }
 
@@ -138,7 +138,7 @@ class _OutputPageState extends State<OutputPage> {
                   enabled: false,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Sun Declination'
+                      labelText: 'Sun Declination',
                   ),
                 ),
                 Divider(
@@ -152,7 +152,8 @@ class _OutputPageState extends State<OutputPage> {
                   enabled: false,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Sun True Bearing'
+                      labelText: 'Sun True Bearing',
+                      suffixText: '°'
                   ),
                 ),
                 sizedBox,
@@ -271,7 +272,6 @@ class _OutputPageState extends State<OutputPage> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Gyro Error',
-                      suffixText: '°'
                   ),
                 ),
                 sizedBox,
@@ -281,7 +281,6 @@ class _OutputPageState extends State<OutputPage> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Magnetic Error',
-                      suffixText: '°'
                   ),
                 )
               ],

@@ -46,7 +46,7 @@ class OutputData {
 
     // A placeholder magnetic declination of 0,0 is used to allow async fetching
     // on getter, enabling loading disks on view
-    this.magError = _calculateMagError(_gyroHdg, gyroErr, _magHdg, 0.0);
+    this.magError = _calculateMagError(_gyroHdg, _gyroAzimuth, _magHdg, 0.0);
   }
 
   DateTime get dateTime => _dateTime;
@@ -97,6 +97,24 @@ class OutputData {
     }
   }
 
+  String getSunDeclAsString() {
+    var result = sunDeclination.abs().toStringAsFixed(2);
+    result += '° ' + (sunDeclination.isNegative ? 'S' : 'N');
+    return result;
+  }
+
+  String getGyroErrorAsString() {
+    var result = gyroError.abs().toStringAsFixed(1);
+    result += '° ' + (gyroError.isNegative ? 'W' : 'E');
+    return result;
+  }
+
+  String getMagErrorAsString() {
+    var result = magError.abs().toStringAsFixed(1);
+    result += '° ' + (magError.isNegative ? 'W' : 'E');
+    return result;
+  }
+
   String _getGHA(double lha, double longitude) {
     double gha;
     gha = lha - longitude;
@@ -106,22 +124,23 @@ class OutputData {
   double _calculateGyroError(
       double trueAzimuth,
       double gyroAzimuth) {
-    return BearingCalc.getBearingDiff(trueAzimuth, gyroAzimuth);
+    return BearingCalc.getBearingDiff(gyroAzimuth, trueAzimuth);
   }
 
   double _calculateMagError(
       double gyroHdg,
-      double gyroError,
+      double gyroAz,
       double magHdg,
       double magDeclination,
       ) {
-    var trueHdg = normalizeBearing(gyroHdg + (gyroError * -1));
-    var correctedMagHdg = normalizeBearing(magHdg + magDeclination);
-    return BearingCalc.getBearingDiff(trueHdg, correctedMagHdg);
+    var magDiff = BearingCalc.getBearingDiff(gyroHdg, magHdg);
+    var magAz = normalizeBearing(gyroAz + magDiff);
+    var correctedMagAz = normalizeBearing(magAz + magDeclination);
+    return BearingCalc.getBearingDiff(correctedMagAz, trueAzimuth);
   }
 
   void _recalculate(double gyroH, double magH) {
-    this.magError = _calculateMagError(gyroH, gyroError, magH, _magDeclination);
+    this.magError = _calculateMagError(gyroH, _gyroAzimuth, magH, _magDeclination);
   }
 
   SPAOutput _getOutputData(InputData inputData, SPAIntermediate intermediate) {

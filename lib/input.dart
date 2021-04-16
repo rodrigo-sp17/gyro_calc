@@ -9,8 +9,6 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/gestures.dart' show DragStartBehavior;
-import 'package:latlong/latlong.dart';
 
 import 'data/input_data.dart';
 import 'data/lat_long.dart';
@@ -425,7 +423,7 @@ class InputFormState extends State<InputForm> {
               onSaved: (value) {
                 setState(() {
                   var az = double.parse(value);
-                  inputData.azimuth = ((az * 2).round()) / 2;
+                  inputData.azimuth = az;
                 });
               },
             ),
