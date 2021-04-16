@@ -30,6 +30,7 @@ class _OutputPageState extends State<OutputPage> {
   final _gyroHdgController = TextEditingController();
   final _magHdgController = TextEditingController();
   final _magDecController = TextEditingController();
+  bool _isFetchingMagDec = false;
   final _gyroErrorController = TextEditingController();
   final _magErrorController = TextEditingController();
 
@@ -45,6 +46,8 @@ class _OutputPageState extends State<OutputPage> {
     _gyroAzController.text = outputData.gyroAzimuth.toStringAsFixed(1);
     _gyroHdgController.text = outputData.gyroHdg.toStringAsFixed(1);
     _magHdgController.text = outputData.magHdg.toStringAsFixed(1);
+    _magDecController.text = outputData.magDeclination.toStringAsFixed(1);
+    _fetchMagDeclination();
     _gyroErrorController.text = outputData.gyroError.toStringAsFixed(1);
     _magErrorController.text = outputData.magError.toStringAsFixed(1);
   }
@@ -64,21 +67,20 @@ class _OutputPageState extends State<OutputPage> {
     super.dispose();
   }
 
-  String _validateGyroHdg(String value) {
-/*    if (value.length != 5) {
-      return 'Heading format must be 000.0';
-    }*/
-    var hdg = double.tryParse(value);
-    if (hdg == null || hdg < 0 || hdg >= 360) {
-      return 'Invalid heading';
-    }
-    return null;
+  void _fetchMagDeclination() {
+    setState(() {
+      _isFetchingMagDec = true;
+    });
+    var magDeclination = outputData.fetchMagDeclination();
+    magDeclination.then((value) => {
+      _magDecController.text = value.toStringAsFixed(1)
+    });
+    magDeclination.whenComplete(() => this.setState(() {
+      _isFetchingMagDec = false;
+    }));
   }
 
-  String _validateMagHdg(String value) {
-/*    if (value.length != 5) {
-      return 'Heading format must be 000.0';
-    }*/
+  String _validateHdg(String value) {
     var hdg = double.tryParse(value);
     if (hdg == null || hdg < 0 || hdg >= 360) {
       return 'Invalid heading';
@@ -91,7 +93,6 @@ class _OutputPageState extends State<OutputPage> {
       _magErrorController.text = outputData.magError.toStringAsFixed(1);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -171,9 +172,9 @@ class _OutputPageState extends State<OutputPage> {
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
-                        validator: _validateGyroHdg,
+                        validator: _validateHdg,
                         onFieldSubmitted: (value) {
-                          if (_validateGyroHdg(value) == null) {
+                          if (_validateHdg(value) == null) {
                             var hdg = double.parse(value);
                             setState(() {
                               _gyroHdgController.text = hdg.toStringAsFixed(1)
@@ -198,9 +199,9 @@ class _OutputPageState extends State<OutputPage> {
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
-                        validator: _validateMagHdg,
+                        validator: _validateHdg,
                         onFieldSubmitted: (value) {
-                          if (_validateMagHdg(value) == null) {
+                          if (_validateHdg(value) == null) {
                             var hdg = double.parse(value);
                             setState(() {
                               _magHdgController.text = hdg.toStringAsFixed(1)
@@ -215,14 +216,46 @@ class _OutputPageState extends State<OutputPage> {
                   ],
                 ),
                 sizedBox,
-                TextField(
-                  controller: _magDecController,
-                  enabled: false,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Magnetic Declination',
-                      suffixText: '°'
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: _magDecController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: InputDecoration(
+                            filled: true,
+                            labelText: 'Magnetic Declination',
+                            suffixText: '°'
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [azFormatter],
+                        validator: _validateHdg,
+                        onFieldSubmitted: (value) {
+                          if (_validateHdg(value) == null) {
+                            var dec = double.parse(value);
+                            setState(() {
+                              _magDecController.text = dec.toStringAsFixed(1)
+                                  .padLeft(5, '0');
+                              outputData.magDeclination = dec;
+                            });
+                            _handleHeadingChanges();
+                          }
+                        },
+                      )
+                    ),
+                    Visibility(
+                      visible: _isFetchingMagDec,
+                      child: Flexible(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: CircularProgressIndicator(
+                            value: null,
+                          )
+                        )
+                      )
+                    )
+                  ],
                 ),
                 sizedBox,
                 TextField(
