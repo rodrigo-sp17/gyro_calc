@@ -13,8 +13,7 @@ import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:latlong/latlong.dart';
 
 import 'data/input_data.dart';
-import 'data/lat_sign.dart';
-import 'data/long_sign.dart';
+import 'data/lat_long.dart';
 
 class InputPage extends StatefulWidget {
   InputPage({Key key, this.title}) : super(key: key);
@@ -99,9 +98,6 @@ class InputFormState extends State<InputForm> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      // calculate form
-      log('Calculating data');
-      log(inputData.toString());
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -189,26 +185,26 @@ class InputFormState extends State<InputForm> {
   }
 
   void _handleLatSign() {
-    if (inputData.latSign == LatSign.S) {
-      setState(() {
-        inputData.latSign = LatSign.N;
-      });
+    LatSign result;
+    if (inputData.position.latSign == LatSign.S) {
+      result = LatSign.N;
     } else {
-      setState(() {
-        inputData.latSign = LatSign.S;
-      });
+      result = LatSign.S;
     }
+    setState(() {
+      inputData.position.latSign = result;
+    });
   }
 
   void _handleLongSign() {
     LongSign result;
-    if (inputData.longSign == LongSign.W) {
+    if (inputData.position.longSign == LongSign.W) {
       result = LongSign.E;
     } else {
       result = LongSign.W;
     }
     setState(() {
-      inputData.longSign = result;
+      inputData.position.longSign = result;
     });
   }
 
@@ -296,7 +292,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _latDeg,
-                    initialValue: inputData.latDeg.toString(),
+                    initialValue: inputData.position.latDeg.toString(),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       filled: true,
@@ -312,7 +308,7 @@ class InputFormState extends State<InputForm> {
                     ],
                     onSaved: (value) {
                       setState(() {
-                        inputData.latDeg = int.parse(value);
+                        inputData.position.latDeg = int.parse(value);
                       });
                     },
                   ),
@@ -322,7 +318,7 @@ class InputFormState extends State<InputForm> {
                     child: TextFormField(
                       textAlign: TextAlign.end,
                       focusNode: _latMin,
-                      initialValue: inputData.latMin.toString(),
+                      initialValue: inputData.position.latMin.toString(),
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           filled: true,
@@ -333,7 +329,7 @@ class InputFormState extends State<InputForm> {
                       inputFormatters: [minFormatter],
                       onSaved: (value) {
                         setState(() {
-                          inputData.latMin = double.parse(value);
+                          inputData.position.latMin = double.parse(value);
                         });
                       },
                     ),
@@ -341,7 +337,7 @@ class InputFormState extends State<InputForm> {
                 SizedBox(width: 20),
                 ElevatedButton(
                     onPressed: _handleLatSign,
-                    child: Text(inputData.latSign.toString().split('.').last)
+                    child: Text(inputData.position.latSign.value)
                 )
               ],
             ),
@@ -356,7 +352,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _longDeg,
-                    initialValue: inputData.longDeg.toString(),
+                    initialValue: inputData.position.longDeg.toString(),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
@@ -372,7 +368,7 @@ class InputFormState extends State<InputForm> {
                     ],
                     onSaved: (value) {
                       setState(() {
-                        inputData.longDeg = int.parse(value);
+                        inputData.position.longDeg = int.parse(value);
                       });
                     },
                   ),
@@ -382,7 +378,7 @@ class InputFormState extends State<InputForm> {
                   child: TextFormField(
                     textAlign: TextAlign.end,
                     focusNode: _longMin,
-                    initialValue: inputData.longMin.toString(),
+                    initialValue: inputData.position.longMin.toString(),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
@@ -393,7 +389,7 @@ class InputFormState extends State<InputForm> {
                     inputFormatters: [minFormatter],
                     onSaved: (value) {
                       setState(() {
-                        inputData.longMin = double.parse(value);
+                        inputData.position.longMin = double.parse(value);
                       });
                     },
                   ),
@@ -401,7 +397,7 @@ class InputFormState extends State<InputForm> {
                 SizedBox(width: 20),
                 ElevatedButton(
                     onPressed: _handleLongSign,
-                    child: Text(inputData.longSign.toString().split('.').last)
+                    child: Text(inputData.position.longSign.value)
                 )
               ],
             ),

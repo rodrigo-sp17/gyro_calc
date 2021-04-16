@@ -36,17 +36,17 @@ class _OutputPageState extends State<OutputPage> {
 
   @override
   void initState() {
+    super.initState();
     outputData = OutputData(widget.inputData);
-    _lhaController.text = '252 deg 54.1\'';
-    _ghaController.text = 'Some degree';
-    _sunDecController.text = outputData.getSunDeclination().toStringAsFixed(2);
-    _trueAzController.text = widget.inputData.azimuth.toStringAsFixed(1);
-    _gyroAzController.text = outputData.inputData.azimuth.toString();
-    _gyroHdgController.text = 000.0.toString();
-    _magHdgController.text = 000.0.toString();
-    _gyroErrorController.text = outputData.getGyroError(123.0)
-        .toString();
-    _magErrorController.text = 000.0.toString();
+    _lhaController.text = outputData.lha;
+    _ghaController.text = outputData.gha;
+    _sunDecController.text = outputData.sunDeclination.toStringAsFixed(2);
+    _trueAzController.text = outputData.trueAzimuth.toStringAsFixed(1);
+    _gyroAzController.text = outputData.gyroAzimuth.toStringAsFixed(1);
+    _gyroHdgController.text = outputData.gyroHdg.toStringAsFixed(1);
+    _magHdgController.text = outputData.magHdg.toStringAsFixed(1);
+    _gyroErrorController.text = outputData.gyroError.toStringAsFixed(1);
+    _magErrorController.text = outputData.magError.toStringAsFixed(1);
   }
 
   @override
@@ -86,8 +86,10 @@ class _OutputPageState extends State<OutputPage> {
     return null;
   }
 
-  void _updateValues() {
-    print('updating values...');
+  void _handleHeadingChanges() {
+    setState(() {
+      _magErrorController.text = outputData.magError.toStringAsFixed(1);
+    });
   }
 
 
@@ -110,7 +112,7 @@ class _OutputPageState extends State<OutputPage> {
                   enabled: false,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'LHA'
+                      labelText: 'LHA (Approx.)'
                   ),
                 ),
                 sizedBox,
@@ -119,7 +121,7 @@ class _OutputPageState extends State<OutputPage> {
                   enabled: false,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'GHA'
+                      labelText: 'GHA (Approx.)'
                   ),
                 ),
                 sizedBox,
@@ -172,11 +174,13 @@ class _OutputPageState extends State<OutputPage> {
                         validator: _validateGyroHdg,
                         onFieldSubmitted: (value) {
                           if (_validateGyroHdg(value) == null) {
+                            var hdg = double.parse(value);
                             setState(() {
-                              _gyroHdgController.text = double.parse(value)
-                                  .toStringAsFixed(1).padLeft(5, '0');
+                              _gyroHdgController.text = hdg.toStringAsFixed(1)
+                                  .padLeft(5, '0');
+                              outputData.gyroHdg = hdg;
                             });
-                            _updateValues();
+                            _handleHeadingChanges();
                           }
                         },
 
@@ -197,11 +201,13 @@ class _OutputPageState extends State<OutputPage> {
                         validator: _validateMagHdg,
                         onFieldSubmitted: (value) {
                           if (_validateMagHdg(value) == null) {
+                            var hdg = double.parse(value);
                             setState(() {
-                              _magHdgController.text = double.parse(value)
-                                  .toStringAsFixed(1).padLeft(5, '0');
+                              _magHdgController.text = hdg.toStringAsFixed(1)
+                                  .padLeft(5, '0');
+                              outputData.magHdg = hdg;
                             });
-                            _updateValues();
+                            _handleHeadingChanges();
                           }
                         },
                       ),
