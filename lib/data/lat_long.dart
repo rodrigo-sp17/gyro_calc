@@ -6,10 +6,10 @@ import 'package:validate/validate.dart';
 class LatLong {
   int _latDeg;
   double _latMin;
-  LatSign latSign;
+  LatSign _latSign;
   int _longDeg;
   double _longMin;
-  LongSign longSign;
+  LongSign _longSign;
 
   LatLong(int latDeg, this._latMin, int longDeg, this._longMin) {
     Validate.inclusiveBetween(-90, 90, latDeg,
@@ -20,11 +20,11 @@ class LatLong {
         "Latitude minutes must be between 0 and 60 but was $_latMin");
     Validate.inclusiveBetween(0.0, 60.0, _longMin,
         "Longitude minutes must be between 0 and 60 but was $_longMin");
-    _latDeg = latDeg.abs();
-    _longDeg = longDeg.abs();
+    _latDeg = latDeg;
+    _longDeg = longDeg;
 
-    latSign = _latDeg > 0 ? LatSign.N : LatSign.S;
-    longSign = _latMin > 0 ? LongSign.E : LongSign.W;
+    _latSign = _latDeg >= 0 ? LatSign.N : LatSign.S;
+    _longSign = _longDeg >= 0 ? LongSign.E : LongSign.W;
   }
 
   LatLong.fromDoubles(double latitude, double longitude) {
@@ -33,28 +33,30 @@ class LatLong {
     Validate.inclusiveBetween(-180.0, 180.0, longitude,
         "Longitude must be between -90 and 90 degrees but was $longitude");
     var absLat = latitude.abs();
-    _latDeg = absLat.floor();
+    _latDeg = (absLat.floor() * latitude.sign).toInt();
     _latMin = (absLat - absLat.floor()) * 60;
-    latSign = latitude > 0 ? LatSign.N : LatSign.S;
+    _latSign = latitude >= 0 ? LatSign.N : LatSign.S;
 
     var absLong = longitude.abs();
-    _longDeg = absLong.floor();
+    _longDeg = (absLong.floor() * longitude.sign).toInt();
     _longMin = (absLong - absLong.floor()) * 60;
-    longSign = longitude > 0 ? LongSign.E : LongSign.W;
+    _longSign = longitude >= 0 ? LongSign.E : LongSign.W;
   }
 
   String getLatString() {
-    return "$latDeg° $latMin' $latSign";
+    var absLatDeg = _latDeg.abs();
+    return "$absLatDeg° $latMin' $_latSign";
   }
 
   String getLongString() {
-    return "$longDeg° $longMin' $longSign";
+    var absLongDeg = _longDeg.abs();
+    return "$absLongDeg° $longMin' $_longSign";
   }
 
   double getLatDecimal() {
-    double minDecimal = latMin / 60;
-    double latDecimal = latDeg + minDecimal;
-    if (latSign == LatSign.N) {
+    double minDecimal = _latMin / 60;
+    double latDecimal = _latDeg.abs() + minDecimal;
+    if (_latSign == LatSign.N) {
       return latDecimal;
     } else {
       return -latDecimal;
@@ -62,9 +64,9 @@ class LatLong {
   }
 
   double getLongDecimal() {
-    double minDecimal = longMin / 60;
-    double longDecimal = longDeg + minDecimal;
-    if (longSign == LongSign.W) {
+    double minDecimal = _longMin / 60;
+    double longDecimal = _longDeg.abs() + minDecimal;
+    if (_longSign == LongSign.W) {
       return -longDecimal;
     } else {
       return longDecimal;
@@ -85,8 +87,8 @@ class LatLong {
   set longDeg(int value) {
     Validate.inclusiveBetween(-180, 180, value,
         "Longitude must be between -180 and 180 degrees but was $value");
-    _longDeg = value.abs();
-    longSign = value > 0 ? LongSign.E : LongSign.W;
+    _longDeg = value;
+    _longSign = value > 0 ? LongSign.E : LongSign.W;
   }
 
 
@@ -103,8 +105,32 @@ class LatLong {
   set latDeg(int value) {
     Validate.inclusiveBetween(-90, 90, value,
         "Latitude must be between -90 and 90 degrees but was $value");
-    _latDeg = value.abs();
-    latSign  = value > 0 ? LatSign.N : LatSign.S;
+    _latDeg = value;
+    _latSign  = value > 0 ? LatSign.N : LatSign.S;
+  }
+
+  LatSign get latSign => _latSign;
+
+  set latSign(LatSign value) {
+    if (value == LatSign.N) {
+      _latDeg = _latDeg.abs();
+      _latSign = LatSign.N;
+    } else {
+      _latDeg = -1 * _latDeg.abs();
+      _latSign = LatSign.S;
+    }
+  }
+
+  LongSign get longSign => _longSign;
+
+  set longSign(LongSign value) {
+    if (value == LongSign.E) {
+      _longDeg = _longDeg.abs();
+      _longSign = LongSign.E;
+    } else {
+      _longDeg = -1 * _longDeg.abs();
+      _longSign = LongSign.W;
+    }
   }
 }
 

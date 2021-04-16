@@ -308,7 +308,11 @@ class InputFormState extends State<InputForm> {
                     ],
                     onSaved: (value) {
                       setState(() {
-                        inputData.position.latDeg = int.parse(value);
+                        if (inputData.position.latSign == LatSign.S) {
+                          inputData.position.latDeg = -1 * int.parse(value);
+                        } else {
+                          inputData.position.latDeg = int.parse(value);
+                        }
                       });
                     },
                   ),
@@ -368,7 +372,11 @@ class InputFormState extends State<InputForm> {
                     ],
                     onSaved: (value) {
                       setState(() {
-                        inputData.position.longDeg = int.parse(value);
+                        if (inputData.position.longSign == LongSign.W) {
+                          inputData.position.longDeg = -1 * int.parse(value);
+                        } else {
+                          inputData.position.longDeg = int.parse(value);
+                        }
                       });
                     },
                   ),
