@@ -3,7 +3,7 @@ import 'package:gyro_error/data/lat_long.dart';
 import 'package:gyro_error/data/output_data.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-import 'data/input_data.dart';
+import '../data/input_data.dart';
 
 class OutputPage extends StatefulWidget {
   OutputPage({Key key, this.title, @required this.inputData}) : super(key: key);

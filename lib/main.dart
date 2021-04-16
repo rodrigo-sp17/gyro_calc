@@ -7,7 +7,7 @@
 //import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gyro_error/input.dart';
+import 'package:gyro_error/view/input.dart';
 
 void main() => runApp(GyroErrorApp());
 

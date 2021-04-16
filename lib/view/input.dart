@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:gyro_error/output.dart';
+import 'package:gyro_error/view/output.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'data/input_data.dart';
-import 'data/lat_long.dart';
+import '../data/input_data.dart';
+import '../data/lat_long.dart';
 
 class InputPage extends StatefulWidget {
   InputPage({Key key, this.title}) : super(key: key);

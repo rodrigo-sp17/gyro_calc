@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:gyro_error/bearing_calc.dart';
+import 'package:gyro_error/util/bearing_calc.dart';
 import 'package:gyro_error/data/lat_long.dart';
 import 'package:latlong/latlong.dart';
 import 'package:spa/spa.dart';

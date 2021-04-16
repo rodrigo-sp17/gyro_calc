@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gyro_error/bearing_calc.dart';
+import 'package:gyro_error/util/bearing_calc.dart';
 
 void main() {
   test('Bearing differences are correct', () {
