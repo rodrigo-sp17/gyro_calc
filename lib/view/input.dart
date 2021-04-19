@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:gyro_error/view/output.dart';
+import 'package:gyro_calc/view/output.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 

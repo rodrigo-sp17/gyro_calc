@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gyro_error/data/lat_long.dart';
+import 'package:gyro_calc/data/lat_long.dart';
 
 var ne = LatLong(1, 1.1, 2, 2.2);
 var nw = LatLong(1, 1.1, -3, 3.3);

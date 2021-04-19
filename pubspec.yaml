@@ -1,4 +1,4 @@
-name: gyro_error
+name: gyro_calc
 description: Calculates error for magnetic and gyro compasses.
 
 # The following line prevents the package from being accidentally published to

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gyro_error/data/lat_long.dart';
-import 'package:gyro_error/data/output_data.dart';
+import 'package:gyro_calc/data/lat_long.dart';
+import 'package:gyro_calc/data/output_data.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../data/input_data.dart';

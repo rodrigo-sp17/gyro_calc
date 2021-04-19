@@ -1,4 +1,4 @@
-package com.github.rodrigosp.gyro_error;
+package com.github.rodrigosp.gyro_calc;
 
 import io.flutter.embedding.android.FlutterActivity;
 

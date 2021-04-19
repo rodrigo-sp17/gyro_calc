@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:gyro_error/data/lat_long.dart';
+import 'package:gyro_calc/data/lat_long.dart';
 
 class InputData {
   DateTime date = DateTime.now().toUtc();
