@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 import '../data/input_data.dart';
 import '../data/lat_long.dart';
 import 'output.dart';
-import 'output.dart';
 
 class InputPage extends StatefulWidget {
   InputPage({Key key, this.title}) : super(key: key);

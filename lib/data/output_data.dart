@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:gyro_calc/util/bearing_calc.dart';
 import 'package:gyro_calc/data/lat_long.dart';

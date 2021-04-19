@@ -20,7 +20,7 @@ class GyroCalcApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.lightBlue,
       ),
-      home: InputPage(title: 'Compass Error Calculator')
+      home: InputPage(title: 'Inputs for Calculation')
     );
   }
 }

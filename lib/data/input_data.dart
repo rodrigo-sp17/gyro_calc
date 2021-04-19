@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:gyro_calc/data/lat_long.dart';
 
