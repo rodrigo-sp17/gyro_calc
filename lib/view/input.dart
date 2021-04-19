@@ -25,6 +25,33 @@ class _InputPageState extends State<InputPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (result) {
+              switch (result) {
+                case 'about': {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: Text('About'),
+                      content: Text(
+                          'Built by Rodrigo Silva, developer and 3rd Off.\n'
+                          'Contact: rodrigosilvap93@gmail.com'
+                      ),
+                    )
+                  );
+                }
+                break;
+              }
+            },
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem(
+                  value: 'about',
+                  child: Text('About')
+              )
+            ],
+          )
+        ],
       ),
       body: const InputForm(),
     );
