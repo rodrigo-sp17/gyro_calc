@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gyro_calc/view/output.dart';
@@ -9,6 +10,8 @@ import 'package:intl/intl.dart';
 
 import '../data/input_data.dart';
 import '../data/lat_long.dart';
+import 'output.dart';
+import 'output.dart';
 
 class InputPage extends StatefulWidget {
   InputPage({Key key, this.title}) : super(key: key);
@@ -53,7 +56,7 @@ class _InputPageState extends State<InputPage> {
           )
         ],
       ),
-      body: const InputForm(),
+      body: const InputForm()
     );
   }
 }
@@ -162,10 +165,31 @@ class InputFormState extends State<InputForm> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
+      var route = PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 600),
+        reverseTransitionDuration: Duration(milliseconds: 300),
+        pageBuilder: (
+        BuildContext context,
+        Animation<double> primaryAnimation,
+        Animation<double> secondaryAnimation
+        ) => OutputPage(inputData: inputData),
+        transitionsBuilder: (
+          BuildContext context,
+          Animation<double> primaryAnimation,
+          Animation<double> secondaryAnimation,
+          Widget child
+        ) {
+          return SharedAxisTransition(
+              animation: primaryAnimation,
+              secondaryAnimation: secondaryAnimation,
+              transitionType: SharedAxisTransitionType.horizontal,
+              child: child,
+          );
+        }
+      );
       Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => OutputPage(inputData: inputData))
+          route
       );
     }
   }
