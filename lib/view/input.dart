@@ -280,14 +280,14 @@ class InputFormState extends State<InputForm> {
       autovalidateMode: AutovalidateMode.disabled,
       child: Scrollbar(
         child: ListView(
-          padding: EdgeInsets.only(left: 8, right: 8),
+          padding: EdgeInsets.only(left: 8, right: 8, top: 10),
           children: [
             InputDecorator(
               decoration: InputDecoration(
                 filled: true,
                 icon: Icon(Icons.calendar_today),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 2)
+                contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 2)
               ),
               child: InputDatePickerFormField(
                 initialDate: inputData.date,
