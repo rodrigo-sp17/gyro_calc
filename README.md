@@ -1,16 +1,30 @@
-# gyro_error
-
-Calculates error for magnetic and gyro compasses.
+# Gyro Calc
+Gyro Calc is a simple Flutter app to calculate errors from gyro and magnetic compasses according 
+to Sun's position. It works by requiring minimum input by navigators while providing highly detailed outputs, 
+making the most of modern astronomical algorithms and technology to reduce much of the table-checking still
+present in the industry.
 
 ## Getting Started
+Just get the APK file from release and install in your Android device. :)
 
-This project is a starting point for a Flutter application.
+## Usage
+Usage is very self-explanatory.
+The navigator has to input:
+- Current date (default: today)
+- Current time, on UTC time zone (default: now)
+- Latitude and longitude degrees, in absolute values (default: present GPS position)
+- Latitude and longitude minutes, in absolute values and with decimal seconds (default: present GPS position)
+- Latitude and longitude signs (N-S, W-E)
+- Measured Sun's gyro heading
 
-A few resources to get you started if this is your first Flutter project:
+Once CALCULATE is clicked, some general data will be already available.
+To complete error calculation, it is necessary to input:
+- Gyro heading
+- Magnetic heading
+- (Optional) Magnetic declination
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+The app will try to auto fetch the declination from the internet. If it can't be reached, it will need to be manually
+inserted.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
+[MIT](/LICENSE)
