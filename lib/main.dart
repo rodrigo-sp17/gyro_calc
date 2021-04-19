@@ -9,14 +9,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gyro_error/view/input.dart';
 
-void main() => runApp(GyroErrorApp());
+void main() => runApp(GyroCalcApp());
 
-class GyroErrorApp extends StatelessWidget {
+class GyroCalcApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gyro Error',
+      title: 'Gyro Calc',
       theme: ThemeData(
         primarySwatch: Colors.lightBlue,
       ),
@@ -24,6 +24,13 @@ class GyroErrorApp extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
 
 
 
