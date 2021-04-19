@@ -14,7 +14,7 @@ var dsw = LatLong.fromDoubles(-4.4, -3.3);
 var dzero = LatLong.fromDoubles(0, 0);
 
 main() {
-  test("Constructor keeps signs", (){
+  test("Constructor keeps signs", () {
     expect(ne.latSign, equals(LatSign.N));
     expect(ne.longSign, equals(LongSign.E));
     expect(nw.latSign, equals(LatSign.N));
@@ -27,7 +27,7 @@ main() {
     expect(zero.longSign, equals(LongSign.E));
   });
 
-  test("FromDoubles keeps signs", (){
+  test("FromDoubles keeps signs", () {
     expect(dne.latSign, equals(LatSign.N));
     expect(dne.longSign, equals(LongSign.E));
     expect(dnw.latSign, equals(LatSign.N));
@@ -40,7 +40,7 @@ main() {
     expect(dzero.longSign, equals(LongSign.E));
   });
 
-  test("Decimal results agree to constructor sign", (){
+  test("Decimal results agree to constructor sign", () {
     expect(ne.getLatDecimal().isNegative, equals(false));
     expect(ne.getLongDecimal().isNegative, equals(false));
     expect(nw.getLatDecimal().isNegative, equals(false));

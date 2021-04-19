@@ -18,9 +18,7 @@ class _OutputPageState extends State<OutputPage> {
   OutputData outputData;
 
   var azFormatter = new MaskTextInputFormatter(
-      mask: '###.#',
-      filter: { "#": RegExp(r'[0-9]') }
-  );
+      mask: '###.#', filter: {"#": RegExp(r'[0-9]')});
 
   final _lhaController = TextEditingController();
   final _ghaController = TextEditingController();
@@ -35,7 +33,6 @@ class _OutputPageState extends State<OutputPage> {
   final _gyroErrorController = TextEditingController();
   final _magErrorController = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
@@ -48,7 +45,8 @@ class _OutputPageState extends State<OutputPage> {
     _gyroHdgController.text = outputData.gyroHdg.toStringAsFixed(1);
     _magHdgController.text = outputData.magHdg.toStringAsFixed(1);
     _magDecController.text = outputData.magDeclination.abs().toStringAsFixed(1);
-    _magDecSign = outputData.magDeclination.isNegative ? LongSign.W : LongSign.E;
+    _magDecSign =
+        outputData.magDeclination.isNegative ? LongSign.W : LongSign.E;
     _fetchMagDeclination();
     _gyroErrorController.text = outputData.getGyroErrorAsString();
     _magErrorController.text = outputData.getMagErrorAsString();
@@ -75,13 +73,13 @@ class _OutputPageState extends State<OutputPage> {
     });
     var magDeclination = outputData.fetchMagDeclination();
     magDeclination.then((value) => {
-      _magDecController.text = value.abs().toStringAsFixed(1),
-      _magDecSign = value.isNegative ? LongSign.W : LongSign.E,
-      this._handleDataChanges()
-    });
+          _magDecController.text = value.abs().toStringAsFixed(1),
+          _magDecSign = value.isNegative ? LongSign.W : LongSign.E,
+          this._handleDataChanges()
+        });
     magDeclination.whenComplete(() => this.setState(() {
-      _isFetchingMagDec = false;
-    }));
+          _isFetchingMagDec = false;
+        }));
   }
 
   String _validateHdg(String value) {
@@ -110,10 +108,9 @@ class _OutputPageState extends State<OutputPage> {
     if (_validateMagDecl(value) == null) {
       var dec = double.parse(value);
       setState(() {
-        _magDecController.text = dec.toStringAsFixed(1)
-            .padLeft(5, '0');
+        _magDecController.text = dec.toStringAsFixed(1).padLeft(5, '0');
         outputData.magDeclination =
-        _magDecSign == LongSign.E ? dec.abs() : dec.abs() * -1;
+            _magDecSign == LongSign.E ? dec.abs() : dec.abs() * -1;
       });
       _handleDataChanges();
     }
@@ -137,39 +134,35 @@ class _OutputPageState extends State<OutputPage> {
     const sizedBox = SizedBox(height: 15);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Results'),
-      ),
-      body: Container(
-        padding: EdgeInsets.only(left: 8, right: 8, top: 12),
-        child: Scrollbar(
-            child: ListView(
+        appBar: AppBar(
+          title: Text('Results'),
+        ),
+        body: Container(
+            padding: EdgeInsets.only(left: 8, right: 8, top: 12),
+            child: Scrollbar(
+                child: ListView(
               padding: EdgeInsets.only(top: 12, bottom: 12),
               children: [
                 TextField(
                   controller: _lhaController,
                   enabled: false,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'LHA (Approx.)'
-                  ),
+                      border: OutlineInputBorder(), labelText: 'LHA (Approx.)'),
                 ),
                 sizedBox,
                 TextField(
                   controller: _ghaController,
                   enabled: false,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'GHA (Approx.)'
-                  ),
+                      border: OutlineInputBorder(), labelText: 'GHA (Approx.)'),
                 ),
                 sizedBox,
                 TextField(
                   controller: _sunDecController,
                   enabled: false,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Sun Declination',
+                    border: OutlineInputBorder(),
+                    labelText: 'Sun Declination',
                   ),
                 ),
                 Divider(
@@ -184,8 +177,7 @@ class _OutputPageState extends State<OutputPage> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Sun True Bearing',
-                      suffixText: '°'
-                  ),
+                      suffixText: '°'),
                 ),
                 sizedBox,
                 TextField(
@@ -194,8 +186,7 @@ class _OutputPageState extends State<OutputPage> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Sun Gyro Bearing',
-                      suffixText: '°'
-                  ),
+                      suffixText: '°'),
                 ),
                 sizedBox,
                 Row(
@@ -207,8 +198,7 @@ class _OutputPageState extends State<OutputPage> {
                         decoration: InputDecoration(
                             filled: true,
                             labelText: 'Gyro HDG',
-                            suffixText: '°'
-                        ),
+                            suffixText: '°'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
                         validator: _validateHdg,
@@ -216,17 +206,18 @@ class _OutputPageState extends State<OutputPage> {
                           if (_validateHdg(value) == null) {
                             var hdg = double.parse(value);
                             setState(() {
-                              _gyroHdgController.text = hdg.toStringAsFixed(1)
-                                  .padLeft(5, '0');
+                              _gyroHdgController.text =
+                                  hdg.toStringAsFixed(1).padLeft(5, '0');
                               outputData.gyroHdg = hdg;
                             });
                             _handleDataChanges();
                           }
                         },
-
                       ),
                     ),
-                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 20,
+                    ),
                     Flexible(
                       child: TextFormField(
                         controller: _magHdgController,
@@ -234,8 +225,7 @@ class _OutputPageState extends State<OutputPage> {
                         decoration: InputDecoration(
                             filled: true,
                             labelText: 'Magnetic HDG',
-                            suffixText: '°'
-                        ),
+                            suffixText: '°'),
                         keyboardType: TextInputType.number,
                         inputFormatters: [azFormatter],
                         validator: _validateHdg,
@@ -243,8 +233,8 @@ class _OutputPageState extends State<OutputPage> {
                           if (_validateHdg(value) == null) {
                             var hdg = double.parse(value);
                             setState(() {
-                              _magHdgController.text = hdg.toStringAsFixed(1)
-                                  .padLeft(5, '0');
+                              _magHdgController.text =
+                                  hdg.toStringAsFixed(1).padLeft(5, '0');
                               outputData.magHdg = hdg;
                             });
                             _handleDataChanges();
@@ -258,37 +248,33 @@ class _OutputPageState extends State<OutputPage> {
                 Row(
                   children: [
                     Flexible(
-                      flex: 3,
-                      child: TextFormField(
-                        controller: _magDecController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        decoration: InputDecoration(
-                            filled: true,
-                            labelText: 'Magnetic Declination',
-                            suffixText: '°'
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [azFormatter],
-                        validator: _validateMagDecl,
-                        onFieldSubmitted: _handleMagDecChanges,
-                      )
+                        flex: 3,
+                        child: TextFormField(
+                          controller: _magDecController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: InputDecoration(
+                              filled: true,
+                              labelText: 'Magnetic Declination',
+                              suffixText: '°'),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [azFormatter],
+                          validator: _validateMagDecl,
+                          onFieldSubmitted: _handleMagDecChanges,
+                        )),
+                    SizedBox(
+                      width: 20,
                     ),
-                    SizedBox(width: 20,),
                     ElevatedButton(
                         onPressed: _handleMagDecSign,
-                        child: Text(_magDecSign.value)
-                    ),
+                        child: Text(_magDecSign.value)),
                     Visibility(
-                      visible: _isFetchingMagDec,
-                      child: Flexible(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: CircularProgressIndicator(
-                            value: null,
-                          )
-                        )
-                      )
-                    )
+                        visible: _isFetchingMagDec,
+                        child: Flexible(
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 20),
+                                child: CircularProgressIndicator(
+                                  value: null,
+                                ))))
                   ],
                 ),
                 sizedBox,
@@ -296,8 +282,8 @@ class _OutputPageState extends State<OutputPage> {
                   controller: _gyroErrorController,
                   enabled: false,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Gyro Error',
+                    border: OutlineInputBorder(),
+                    labelText: 'Gyro Error',
                   ),
                 ),
                 sizedBox,
@@ -305,16 +291,11 @@ class _OutputPageState extends State<OutputPage> {
                   controller: _magErrorController,
                   enabled: false,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Magnetic Error',
+                    border: OutlineInputBorder(),
+                    labelText: 'Magnetic Error',
                   ),
                 )
               ],
-          )
-        )
-      )
-    );
+            ))));
   }
-
 }
-

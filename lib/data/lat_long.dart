@@ -73,7 +73,6 @@ class LatLong {
     }
   }
 
-
   double get longMin => _longMin;
 
   set longMin(double value) {
@@ -91,7 +90,6 @@ class LatLong {
     _longSign = value > 0 ? LongSign.E : LongSign.W;
   }
 
-
   double get latMin => _latMin;
 
   set latMin(double value) {
@@ -106,7 +104,7 @@ class LatLong {
     Validate.inclusiveBetween(-90, 90, value,
         "Latitude must be between -90 and 90 degrees but was $value");
     _latDeg = value;
-    _latSign  = value > 0 ? LatSign.N : LatSign.S;
+    _latSign = value > 0 ? LatSign.N : LatSign.S;
   }
 
   LatSign get latSign => _latSign;

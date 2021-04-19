@@ -75,22 +75,19 @@ class OutputData {
 
   Future<double> fetchMagDeclination() async {
     final response = await http.get(Uri.https(
-            "www.ngdc.noaa.gov",
-            "geomag-web/calculators/calculateDeclination",
-            {
-              "lat1": _position.getLatDecimal().toString(),
-              "lon1": _position.getLongDecimal().toString(),
-              "startYear": _dateTime.year.toString(),
-              "startMonth": _dateTime.month.toString(),
-              "resultFormat": "json"
-            }
-    ));
+        "www.ngdc.noaa.gov", "geomag-web/calculators/calculateDeclination", {
+      "lat1": _position.getLatDecimal().toString(),
+      "lon1": _position.getLongDecimal().toString(),
+      "startYear": _dateTime.year.toString(),
+      "startMonth": _dateTime.month.toString(),
+      "resultFormat": "json"
+    }));
 
     if (response.statusCode == 200) {
-       Map<String, dynamic> json = jsonDecode(response.body);
-       double declination = (json['result'].first)['declination'];
-       magDeclination = declination;
-       return declination;
+      Map<String, dynamic> json = jsonDecode(response.body);
+      double declination = (json['result'].first)['declination'];
+      magDeclination = declination;
+      return declination;
     } else {
       return _magDeclination;
     }
@@ -120,18 +117,16 @@ class OutputData {
     return decimal2sexagesimal(gha);
   }
 
-  double _calculateGyroError(
-      double trueAzimuth,
-      double gyroAzimuth) {
+  double _calculateGyroError(double trueAzimuth, double gyroAzimuth) {
     return BearingCalc.getBearingDiff(gyroAzimuth, trueAzimuth);
   }
 
   double _calculateMagError(
-      double gyroHdg,
-      double gyroAz,
-      double magHdg,
-      double magDeclination,
-      ) {
+    double gyroHdg,
+    double gyroAz,
+    double magHdg,
+    double magDeclination,
+  ) {
     var magDiff = BearingCalc.getBearingDiff(gyroHdg, magHdg);
     var magAz = normalizeBearing(gyroAz + magDiff);
     var correctedMagAz = normalizeBearing(magAz + magDeclination);
@@ -139,15 +134,16 @@ class OutputData {
   }
 
   void _recalculate(double gyroH, double magH) {
-    this.magError = _calculateMagError(gyroH, _gyroAzimuth, magH, _magDeclination);
+    this.magError =
+        _calculateMagError(gyroH, _gyroAzimuth, magH, _magDeclination);
   }
 
   SPAOutput _getOutputData(InputData inputData, SPAIntermediate intermediate) {
-    return spaCalculate(SPAParams(
-        time: inputData.getDateTime(),
-        longitude: inputData.position.getLongDecimal(),
-        latitude: inputData.position.getLatDecimal()),
+    return spaCalculate(
+        SPAParams(
+            time: inputData.getDateTime(),
+            longitude: inputData.position.getLongDecimal(),
+            latitude: inputData.position.getLatDecimal()),
         intermediate: intermediate);
   }
-
 }

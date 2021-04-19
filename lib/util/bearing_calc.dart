@@ -1,7 +1,6 @@
 import 'package:validate/validate.dart';
 
 class BearingCalc {
-
   /// Gets the bearing diff between a [ref] reference and a [hdg] heading
   ///
   /// Positive results are E deviations, negative are W

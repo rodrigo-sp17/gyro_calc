@@ -4,7 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:gyro_calc/view/output.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -21,42 +20,36 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (result) {
-              switch (result) {
-                case 'about': {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: Text('About'),
-                      content: Text(
-                          'Built by Rodrigo Silva, developer and 3rd Off.\n'
-                          'Contact: rodrigosilvap93@gmail.com'
-                      ),
-                    )
-                  );
+        appBar: AppBar(
+          title: Text(widget.title),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (result) {
+                switch (result) {
+                  case 'about':
+                    {
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text('About'),
+                                content: Text(
+                                    'Built by Rodrigo Silva, developer and 3rd Off.\n'
+                                    'Contact: rodrigosilvap93@gmail.com'),
+                              ));
+                    }
+                    break;
                 }
-                break;
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem(
-                  value: 'about',
-                  child: Text('About')
-              )
-            ],
-          )
-        ],
-      ),
-      body: const InputForm()
-    );
+              },
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem(value: 'about', child: Text('About'))
+              ],
+            )
+          ],
+        ),
+        body: const InputForm());
   }
 }
 
@@ -73,18 +66,13 @@ class InputFormState extends State<InputForm> {
   final timeTemplate = DateFormat("HH:mm:ss");
 
   var timeFormatter = new MaskTextInputFormatter(
-      mask: '##:##:##',
-      filter: { "#": RegExp(r'[0-9]') });
+      mask: '##:##:##', filter: {"#": RegExp(r'[0-9]')});
 
   var minFormatter = new MaskTextInputFormatter(
-    mask: '##.###',
-    filter: { "#": RegExp(r'[0-9]') }
-  );
+      mask: '##.###', filter: {"#": RegExp(r'[0-9]')});
 
   var azFormatter = new MaskTextInputFormatter(
-    mask: '###.#',
-    filter: { "#": RegExp(r'[0-9]') }
-  );
+      mask: '###.#', filter: {"#": RegExp(r'[0-9]')});
 
   FocusNode _date, _time, _latDeg, _latMin, _longDeg, _longMin, _az;
 
@@ -144,8 +132,8 @@ class InputFormState extends State<InputForm> {
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied
-          || permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
         return;
       }
     }
@@ -165,31 +153,24 @@ class InputFormState extends State<InputForm> {
     if (form.validate()) {
       form.save();
       var route = PageRouteBuilder(
-        transitionDuration: Duration(milliseconds: 600),
-        reverseTransitionDuration: Duration(milliseconds: 300),
-        pageBuilder: (
-        BuildContext context,
-        Animation<double> primaryAnimation,
-        Animation<double> secondaryAnimation
-        ) => OutputPage(inputData: inputData),
-        transitionsBuilder: (
-          BuildContext context,
-          Animation<double> primaryAnimation,
-          Animation<double> secondaryAnimation,
-          Widget child
-        ) {
-          return SharedAxisTransition(
+          transitionDuration: Duration(milliseconds: 600),
+          reverseTransitionDuration: Duration(milliseconds: 300),
+          pageBuilder: (BuildContext context,
+                  Animation<double> primaryAnimation,
+                  Animation<double> secondaryAnimation) =>
+              OutputPage(inputData: inputData),
+          transitionsBuilder: (BuildContext context,
+              Animation<double> primaryAnimation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            return SharedAxisTransition(
               animation: primaryAnimation,
               secondaryAnimation: secondaryAnimation,
               transitionType: SharedAxisTransitionType.horizontal,
               child: child,
-          );
-        }
-      );
-      Navigator.push(
-          context,
-          route
-      );
+            );
+          });
+      Navigator.push(context, route);
     }
   }
 
@@ -303,118 +284,110 @@ class InputFormState extends State<InputForm> {
       autovalidateMode: AutovalidateMode.disabled,
       child: Scrollbar(
         child: ListView(
-          padding: EdgeInsets.only(left: 8, right: 8, top: 10),
-          children: [
-            InputDecorator(
-              decoration: InputDecoration(
-                filled: true,
-                icon: Icon(Icons.calendar_today),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 2)
-              ),
-              child: InputDatePickerFormField(
-                initialDate: inputData.date,
-                firstDate: DateTime(2012, 1),
-                lastDate: DateTime(2100),
-                errorFormatText: 'Date not recognized',
-                errorInvalidText: 'Date is invalid',
-                fieldHintText: 'Enter the date for calculation',
-                fieldLabelText: 'Date',
-                onDateSaved: (date) {
-                  setState(() {
-                    inputData.date = date;
-                  });
-                },
-              ),
-            ),
-            sizedBox,
-            Row(
-              children: [
-                Flexible(
-                  child: TextFormField(
-                    controller: _timeController,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      filled: true,
-                      icon: const Icon(Icons.access_time),
-                      labelText: 'Time',
-                      hintText: 'Current time',
-                      suffixText: 'UTC',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: _validateTime,
-                    inputFormatters: [timeFormatter],
-                    onSaved: (value) {
-                      DateTime newTime = timeTemplate.parse(value);
-                      setState(() {
-                        inputData.time = newTime;
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _timeController.text = timeTemplate.format(DateTime.now()
-                        .toUtc());
+            padding: EdgeInsets.only(left: 8, right: 8, top: 10),
+            children: [
+              InputDecorator(
+                decoration: InputDecoration(
+                    filled: true,
+                    icon: Icon(Icons.calendar_today),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 2)),
+                child: InputDatePickerFormField(
+                  initialDate: inputData.date,
+                  firstDate: DateTime(2012, 1),
+                  lastDate: DateTime(2100),
+                  errorFormatText: 'Date not recognized',
+                  errorInvalidText: 'Date is invalid',
+                  fieldHintText: 'Enter the date for calculation',
+                  fieldLabelText: 'Date',
+                  onDateSaved: (date) {
+                    setState(() {
+                      inputData.date = date;
+                    });
                   },
-                  child: Text('UPDATE'),
-                )
-              ],
-            ),
-            Divider(
-              height: 40,
-              thickness: 5,
-              indent: 20,
-              endIndent: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                    width: 55,
-                    child: Text('LAT')
                 ),
-                Flexible(
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    focusNode: _latDeg,
-                    controller: _latDegController,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      filled: true,
-                      suffixText: '°',
+              ),
+              sizedBox,
+              Row(
+                children: [
+                  Flexible(
+                    child: TextFormField(
+                      controller: _timeController,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        icon: const Icon(Icons.access_time),
+                        labelText: 'Time',
+                        hintText: 'Current time',
+                        suffixText: 'UTC',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: _validateTime,
+                      inputFormatters: [timeFormatter],
+                      onSaved: (value) {
+                        DateTime newTime = timeTemplate.parse(value);
+                        setState(() {
+                          inputData.time = newTime;
+                        });
+                      },
                     ),
-                    keyboardType: TextInputType.number,
-                    validator: _validateLatDeg,
-                    inputFormatters: <TextInputFormatter>[
-                      new MaskTextInputFormatter(
-                        mask: "##",
-                        filter: { "#": RegExp(r'[0-9]')}
-                      )
-                    ],
-                    onSaved: (value) {
-                      setState(() {
-                        if (inputData.position.latSign == LatSign.S) {
-                          inputData.position.latDeg = -1 * int.parse(value);
-                        } else {
-                          inputData.position.latDeg = int.parse(value);
-                        }
-                      });
-                    },
                   ),
-                ),
-                SizedBox(width: 20),
-                Flexible(
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _timeController.text =
+                          timeTemplate.format(DateTime.now().toUtc());
+                    },
+                    child: Text('UPDATE'),
+                  )
+                ],
+              ),
+              Divider(
+                height: 40,
+                thickness: 5,
+                indent: 20,
+                endIndent: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 55, child: Text('LAT')),
+                  Flexible(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      focusNode: _latDeg,
+                      controller: _latDegController,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        suffixText: '°',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: _validateLatDeg,
+                      inputFormatters: <TextInputFormatter>[
+                        new MaskTextInputFormatter(
+                            mask: "##", filter: {"#": RegExp(r'[0-9]')})
+                      ],
+                      onSaved: (value) {
+                        setState(() {
+                          if (inputData.position.latSign == LatSign.S) {
+                            inputData.position.latDeg = -1 * int.parse(value);
+                          } else {
+                            inputData.position.latDeg = int.parse(value);
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Flexible(
                     child: TextFormField(
                       textAlign: TextAlign.end,
                       focusNode: _latMin,
                       controller: _latMinController,
                       textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                          filled: true,
-                          suffixText: '\''
-                      ),
+                      decoration:
+                          InputDecoration(filled: true, suffixText: '\''),
                       keyboardType: TextInputType.number,
                       validator: _validateLatMin,
                       inputFormatters: [minFormatter],
@@ -424,108 +397,91 @@ class InputFormState extends State<InputForm> {
                         });
                       },
                     ),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                    onPressed: _handleLatSign,
-                    child: Text(inputData.position.latSign.value)
-                )
-              ],
-            ),
-            sizedBox,
-            Row(
-              children: [
-                SizedBox(
-                  width: 55,
-                  child: Text('LONG')
-                ),
-                Flexible(
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    focusNode: _longDeg,
-                    controller: _longDegController,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                        filled: true,
-                        suffixText: '°'
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: _validateLongDeg,
-                    inputFormatters: [
-                      new MaskTextInputFormatter(
-                          mask: "###",
-                          filter: { "#": RegExp(r'[0-9]')}
-                      )
-                    ],
-                    onSaved: (value) {
-                      setState(() {
-                        if (inputData.position.longSign == LongSign.W) {
-                          inputData.position.longDeg = -1 * int.parse(value);
-                        } else {
-                          inputData.position.longDeg = int.parse(value);
-                        }
-                      });
-                    },
                   ),
-                ),
-                SizedBox(width: 20),
-                Flexible(
-                  child: TextFormField(
-                    textAlign: TextAlign.end,
-                    focusNode: _longMin,
-                    controller: _longMinController,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                        filled: true,
-                        suffixText: '\''
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: _validateLongMin,
-                    inputFormatters: [minFormatter],
-                    onSaved: (value) {
-                      setState(() {
-                        inputData.position.longMin = double.parse(value);
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                    onPressed: _handleLongSign,
-                    child: Text(inputData.position.longSign.value)
-                )
-              ],
-            ),
-            sizedBox,
-            TextFormField(
-              focusNode: _az,
-              initialValue: '000.0',
-              decoration: InputDecoration(
-                filled: true,
-                icon: const Icon(Icons.wb_sunny_outlined),
-                labelText: 'Sun Gyro Heading',
-                suffixText: '°'
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                      onPressed: _handleLatSign,
+                      child: Text(inputData.position.latSign.value))
+                ],
               ),
-              keyboardType: TextInputType.number,
-              validator: _validateAz,
-              inputFormatters: [azFormatter],
-              onSaved: (value) {
-                setState(() {
-                  var az = double.parse(value);
-                  inputData.azimuth = az;
-                });
-              },
-            ),
-            sizedBox,
-            ElevatedButton(
-                onPressed: _handleSubmitted,
-                child: Text('CALCULATE'))
-          ]
-        ),
+              sizedBox,
+              Row(
+                children: [
+                  SizedBox(width: 55, child: Text('LONG')),
+                  Flexible(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      focusNode: _longDeg,
+                      controller: _longDegController,
+                      textInputAction: TextInputAction.next,
+                      decoration:
+                          InputDecoration(filled: true, suffixText: '°'),
+                      keyboardType: TextInputType.number,
+                      validator: _validateLongDeg,
+                      inputFormatters: [
+                        new MaskTextInputFormatter(
+                            mask: "###", filter: {"#": RegExp(r'[0-9]')})
+                      ],
+                      onSaved: (value) {
+                        setState(() {
+                          if (inputData.position.longSign == LongSign.W) {
+                            inputData.position.longDeg = -1 * int.parse(value);
+                          } else {
+                            inputData.position.longDeg = int.parse(value);
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Flexible(
+                    child: TextFormField(
+                      textAlign: TextAlign.end,
+                      focusNode: _longMin,
+                      controller: _longMinController,
+                      textInputAction: TextInputAction.next,
+                      decoration:
+                          InputDecoration(filled: true, suffixText: '\''),
+                      keyboardType: TextInputType.number,
+                      validator: _validateLongMin,
+                      inputFormatters: [minFormatter],
+                      onSaved: (value) {
+                        setState(() {
+                          inputData.position.longMin = double.parse(value);
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                      onPressed: _handleLongSign,
+                      child: Text(inputData.position.longSign.value))
+                ],
+              ),
+              sizedBox,
+              TextFormField(
+                focusNode: _az,
+                initialValue: '000.0',
+                decoration: InputDecoration(
+                    filled: true,
+                    icon: const Icon(Icons.wb_sunny_outlined),
+                    labelText: 'Sun Gyro Heading',
+                    suffixText: '°'),
+                keyboardType: TextInputType.number,
+                validator: _validateAz,
+                inputFormatters: [azFormatter],
+                onSaved: (value) {
+                  setState(() {
+                    var az = double.parse(value);
+                    inputData.azimuth = az;
+                  });
+                },
+              ),
+              sizedBox,
+              ElevatedButton(
+                  onPressed: _handleSubmitted, child: Text('CALCULATE'))
+            ]),
       ),
     );
   }
- 
 }
-
-
